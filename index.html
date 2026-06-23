@@ -42,6 +42,9 @@
   nav ul { list-style: none; display: flex; gap: 2rem; }
   nav ul a { color: var(--foam); text-decoration: none; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.9; transition: opacity 0.3s, color 0.3s; }
   nav ul a:hover { color: var(--accent); opacity: 1; }
+  nav .ig-icon { display: inline-flex; align-items: center; color: var(--foam); transition: color 0.3s; }
+  nav .ig-icon:hover { color: var(--accent); }
+  nav .ig-icon svg { width: 22px; height: 22px; }
   .nav-toggle { display: none; background: none; border: none; color: var(--foam); font-size: 1.6rem; cursor: pointer; }
 
   /* HERO */
@@ -154,7 +157,10 @@
   footer .brand span { color: var(--accent); }
   footer a { color: var(--crema); text-decoration: none; border-bottom: 1px solid transparent; transition: border 0.3s; }
   footer a:hover { border-color: var(--accent); }
-  footer .socials { margin: 1.2rem 0; display: flex; gap: 1.5rem; justify-content: center; }
+  footer .socials { margin: 1.4rem 0; display: flex; gap: 1.2rem; justify-content: center; align-items: center; }
+  footer .socials .ig-icon { display: inline-flex; color: var(--crema); transition: color 0.3s, transform 0.3s; }
+  footer .socials .ig-icon:hover { color: var(--accent); transform: translateY(-2px); }
+  footer .socials .ig-icon svg { width: 28px; height: 28px; }
   footer .fine { font-size: 0.75rem; opacity: 0.6; margin-top: 1.5rem; }
 
   /* ANIMATIONS */
@@ -187,6 +193,13 @@
     <li><a href="#menu">Menu</a></li>
     <li><a href="#gallery">Gallery</a></li>
     <li><a href="#book">Book</a></li>
+    <li><a href="https://www.instagram.com/sip_espressobar_yeg/" target="_blank" rel="noopener" class="ig-icon" aria-label="SIP Espresso Bar on Instagram">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+      </svg>
+    </a></li>
   </ul>
 </nav>
 
@@ -292,7 +305,13 @@
   </div>
   <p>Edmonton's mobile coffee bike</p>
   <div class="socials">
-    <a href="https://www.instagram.com/sip_espressobar_yeg/" target="_blank">Instagram</a>
+    <a href="https://www.instagram.com/sip_espressobar_yeg/" target="_blank" rel="noopener" class="ig-icon" aria-label="SIP Espresso Bar on Instagram">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+      </svg>
+    </a>
     <a href="#book">Book Us</a>
   </div>
   <p class="fine">&copy; 2026 SIP Espresso Bar. Crafted with care &amp; caffeine.</p>
@@ -320,16 +339,46 @@
     obs.observe(el);
   });
 
-  // Form (demo — wire up to email/Formspree later)
-  document.getElementById('submitBtn').addEventListener('click', () => {
+  // Form — sends to Formspree
+  document.getElementById('submitBtn').addEventListener('click', async () => {
     const name = document.getElementById('f-name').value.trim();
     const email = document.getElementById('f-email').value.trim();
+    const date = document.getElementById('f-date').value.trim();
+    const type = document.getElementById('f-type').value.trim();
+    const message = document.getElementById('f-msg').value.trim();
     const msg = document.getElementById('formMsg');
+    const btn = document.getElementById('submitBtn');
+
     if (!name || !email) {
       msg.textContent = 'Please add your name and email so we can reach you.';
       return;
     }
-    msg.textContent = 'Thanks, ' + name + '! We\'ll be in touch soon. ☕';
-    ['f-name','f-email','f-date','f-type','f-msg'].forEach(id => document.getElementById(id).value = '');
+
+    btn.disabled = true;
+    msg.textContent = 'Sending...';
+
+    try {
+      const res = await fetch('https://formspree.io/f/xrewbejp', {
+        method: 'POST',
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: name,
+          email: email,
+          'event date': date,
+          'event type': type,
+          message: message,
+          _subject: 'New event inquiry from ' + name + ' — SIP website'
+        })
+      });
+      if (res.ok) {
+        msg.textContent = 'Thanks, ' + name + '! We\'ll be in touch soon. ☕';
+        ['f-name','f-email','f-date','f-type','f-msg'].forEach(id => document.getElementById(id).value = '');
+      } else {
+        msg.textContent = 'Something went wrong. Please email us or try again.';
+      }
+    } catch (e) {
+      msg.textContent = 'Something went wrong. Please check your connection and try again.';
+    }
+    btn.disabled = false;
   });
 </script>
