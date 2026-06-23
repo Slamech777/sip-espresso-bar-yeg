@@ -37,7 +37,8 @@
     transition: background 0.4s ease, padding 0.4s ease;
   }
   nav.scrolled { background: rgba(43,29,22,0.95); padding: 0.7rem 2.5rem; backdrop-filter: blur(6px); }
-  nav .brand { font-family: Georgia, serif; font-size: 1.5rem; color: var(--foam); letter-spacing: 0.18em; }
+  nav .brand { display: flex; align-items: center; gap: 0.6rem; font-family: Georgia, serif; font-size: 1.5rem; color: var(--foam); letter-spacing: 0.18em; text-decoration: none; }
+  nav .brand img { width: 44px; height: 44px; object-fit: contain; display: block; }
   nav .brand span { color: var(--accent); }
   nav ul { list-style: none; display: flex; gap: 2rem; }
   nav ul a { color: var(--foam); text-decoration: none; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.9; transition: opacity 0.3s, color 0.3s; }
@@ -185,7 +186,7 @@
 </style>
 
 <nav id="nav">
-  <div class="brand">SIP<span>.</span></div>
+  <a href="#" class="brand"><img src="logo.png" alt="SIP Espresso Bar"></a>
   <button class="nav-toggle" id="navToggle">&#9776;</button>
   <ul id="navMenu">
     <li><a href="#about">About</a></li>
