@@ -159,17 +159,40 @@
   }
   .book .section-title { color: var(--foam); }
   .book .eyebrow { color: var(--crema); }
-  .form { max-width: 560px; margin: 2.5rem auto 0; display: grid; gap: 1rem; text-align: left; }
-  .form input, .form textarea {
+  .form { max-width: 560px; margin: 2.5rem auto 0; text-align: left; }
+  .form.hidden { display: none; }
+  .form input, .form textarea, .form select {
     width: 100%; padding: 0.9rem 1rem; border: 1px solid rgba(217,180,143,0.35);
     background: rgba(255,255,255,0.06); color: var(--foam); border-radius: 3px;
-    font-family: inherit; font-size: 0.95rem;
+    font-family: inherit; font-size: 1rem;
   }
   .form input::placeholder, .form textarea::placeholder { color: rgba(244,236,226,0.5); }
-  .form input:focus, .form textarea:focus { outline: none; border-color: var(--accent); }
-  .form .row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-  .form button { justify-self: start; cursor: pointer; }
-  .form-msg { margin-top: 1rem; color: var(--crema); font-style: italic; min-height: 1.2rem; }
+  .form input:focus, .form textarea:focus, .form select:focus { outline: none; border-color: var(--accent); }
+  .form select { appearance: none; cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23d9b48f' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 1rem center; padding-right: 2.6rem;
+  }
+  .form select option { background: var(--logo-brown); color: var(--foam); }
+  .form input[type="date"] { color-scheme: dark; }
+
+  /* Stepped flow */
+  .progress { display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 2rem; }
+  .progress .dot { width: 9px; height: 9px; border-radius: 50%; background: rgba(217,180,143,0.3); transition: background 0.3s, transform 0.3s; }
+  .progress .dot.active { background: var(--accent); transform: scale(1.3); }
+  .progress .dot.done { background: var(--crema); }
+  .step { display: none; animation: fadeStep 0.4s ease; }
+  .step.active { display: block; }
+  .step .q { font-family: Georgia, serif; font-size: 1.5rem; color: var(--foam); margin-bottom: 0.4rem; }
+  .step .hint { font-size: 0.9rem; color: var(--crema); opacity: 0.8; margin-bottom: 1.2rem; }
+  .step-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; gap: 1rem; }
+  .step-back { background: none; border: none; color: var(--crema); cursor: pointer; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.12em; opacity: 0.8; transition: opacity 0.3s; }
+  .step-back:hover { opacity: 1; }
+  .step-back.invisible { visibility: hidden; }
+  .form button.btn { cursor: pointer; }
+  .form-msg { margin-top: 1rem; color: var(--crema); font-style: italic; min-height: 1.2rem; text-align: center; }
+  @keyframes fadeStep { from { opacity: 0; transform: translateX(12px); } to { opacity: 1; transform: translateX(0); } }
+  .book-cta { margin-top: 2.5rem; }
+  .book-cta.hidden { display: none; }
 
   /* FOOTER */
   footer { background: var(--espresso); color: var(--crema); text-align: center; padding: 3rem 2rem; }
@@ -301,18 +324,75 @@
   <div class="wrap">
     <p class="eyebrow">Let's Talk</p>
     <h2 class="section-title">Book SIP for your event</h2>
-    <p style="max-width:520px;margin:0 auto;opacity:0.85;">Tell us about your event and we'll get back to you with availability and a custom quote.</p>
-    <div class="form">
-      <div class="row">
-        <input type="text" id="f-name" placeholder="Your name">
-        <input type="email" id="f-email" placeholder="Email">
+    <p style="max-width:520px;margin:0 auto;opacity:0.85;">Barista-crafted coffee, brought right to your celebration. Tell us about your event and we'll send availability and a custom quote.</p>
+
+    <div class="book-cta" id="bookCta">
+      <button class="btn" id="startBooking">Click here to book your next SIP event with us!</button>
+    </div>
+
+    <div class="form hidden" id="bookForm">
+      <div class="progress" id="progress"></div>
+
+      <div class="step active" data-step="0">
+        <p class="q">First, what's your name?</p>
+        <p class="hint">So we know who we're chatting with.</p>
+        <input type="text" id="f-name" placeholder="Jane Doe">
       </div>
-      <div class="row">
-        <input type="text" id="f-date" placeholder="Event date">
-        <input type="text" id="f-type" placeholder="Event type">
+
+      <div class="step" data-step="1">
+        <p class="q">How can we reach you?</p>
+        <p class="hint">We'll send your quote here.</p>
+        <input type="email" id="f-email" placeholder="jane@example.com" style="margin-bottom:1rem;">
+        <input type="tel" id="f-phone" placeholder="Phone (optional)">
       </div>
-      <textarea id="f-msg" rows="4" placeholder="Tell us a little about your event..."></textarea>
-      <button class="btn" id="submitBtn">Request a Quote</button>
+
+      <div class="step" data-step="2">
+        <p class="q">When's your event?</p>
+        <p class="hint">Pick a date — you can adjust details later.</p>
+        <input type="date" id="f-date">
+      </div>
+
+      <div class="step" data-step="3">
+        <p class="q">What kind of event is it?</p>
+        <p class="hint">This helps us tailor the setup.</p>
+        <select id="f-type">
+          <option value="" disabled selected>Select an event type...</option>
+          <option value="Wedding">Wedding</option>
+          <option value="Corporate / Office">Corporate / Office</option>
+          <option value="Market / Festival">Market / Festival</option>
+          <option value="Private Party">Private Party</option>
+          <option value="Fundraiser / Community">Fundraiser / Community</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div class="step" data-step="4">
+        <p class="q">A few event details.</p>
+        <p class="hint">Helps us plan the right setup for your day.</p>
+        <input type="text" id="f-hours" placeholder="Hours of service (e.g. 12pm – 4pm)" style="margin-bottom:1rem;">
+        <input type="text" id="f-location" placeholder="Catering location" style="margin-bottom:1rem;">
+        <input type="number" id="f-guests" min="1" placeholder="Number of guests">
+      </div>
+
+      <div class="step" data-step="5">
+        <p class="q">Almost done!</p>
+        <p class="hint">A couple of final things.</p>
+        <select id="f-hear" style="margin-bottom:1rem;">
+          <option value="" disabled selected>How did you hear about us?</option>
+          <option value="Instagram">Instagram</option>
+          <option value="Facebook">Facebook</option>
+          <option value="Google search">Google search</option>
+          <option value="Word of mouth / referral">Word of mouth / referral</option>
+          <option value="Saw us at an event">Saw us at an event</option>
+          <option value="Other">Other</option>
+        </select>
+        <textarea id="f-msg" rows="4" placeholder="Anything else we should know? (optional)"></textarea>
+      </div>
+
+      <div class="step-nav">
+        <button class="step-back invisible" id="stepBack">&larr; Back</button>
+        <button class="btn" id="stepNext">Next</button>
+      </div>
       <p class="form-msg" id="formMsg"></p>
     </div>
   </div>
@@ -386,22 +466,96 @@
   lightbox.addEventListener('click', (e) => { if (e.target !== lbImg) closeLightbox(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLightbox(); });
 
-  // Form — sends to Formspree
-  document.getElementById('submitBtn').addEventListener('click', async () => {
+  // Booking — multi-step flow
+  const steps = Array.from(document.querySelectorAll('#bookForm .step'));
+  const totalSteps = steps.length;
+  let current = 0;
+  const backBtn = document.getElementById('stepBack');
+  const nextBtn = document.getElementById('stepNext');
+  const progress = document.getElementById('progress');
+
+  // Build progress dots
+  for (let i = 0; i < totalSteps; i++) {
+    const d = document.createElement('span');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    progress.appendChild(d);
+  }
+  const dots = Array.from(progress.children);
+
+  // Set the date picker's minimum to today (no past dates)
+  const dateInput = document.getElementById('f-date');
+  const today = new Date().toISOString().split('T')[0];
+  dateInput.min = today;
+
+  function showStep(n) {
+    steps.forEach((s, i) => s.classList.toggle('active', i === n));
+    dots.forEach((d, i) => {
+      d.classList.toggle('active', i === n);
+      d.classList.toggle('done', i < n);
+    });
+    backBtn.classList.toggle('invisible', n === 0);
+    nextBtn.textContent = (n === totalSteps - 1) ? 'Request a Quote' : 'Next';
+    const field = steps[n].querySelector('input, select, textarea');
+    if (field) setTimeout(() => field.focus(), 50);
+    document.getElementById('formMsg').textContent = '';
+  }
+
+  function validateStep(n) {
+    const msg = document.getElementById('formMsg');
+    if (n === 0 && !document.getElementById('f-name').value.trim()) {
+      msg.textContent = 'Please let us know your name.'; return false;
+    }
+    if (n === 1) {
+      const email = document.getElementById('f-email').value.trim();
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        msg.textContent = 'Please enter a valid email so we can reach you.'; return false;
+      }
+    }
+    if (n === 2 && !document.getElementById('f-date').value) {
+      msg.textContent = 'Please pick your event date.'; return false;
+    }
+    if (n === 3 && !document.getElementById('f-type').value) {
+      msg.textContent = 'Please choose an event type.'; return false;
+    }
+    return true;
+  }
+
+  backBtn.addEventListener('click', () => {
+    if (current > 0) { current--; showStep(current); }
+  });
+
+  nextBtn.addEventListener('click', () => {
+    if (!validateStep(current)) return;
+    if (current < totalSteps - 1) {
+      current++; showStep(current);
+    } else {
+      submitBooking();
+    }
+  });
+
+  // Reveal the form when the CTA is clicked
+  document.getElementById('startBooking').addEventListener('click', () => {
+    document.getElementById('bookCta').classList.add('hidden');
+    document.getElementById('bookForm').classList.remove('hidden');
+    current = 0; showStep(0);
+  });
+
+  // Submit to Formspree
+  async function submitBooking() {
     const name = document.getElementById('f-name').value.trim();
     const email = document.getElementById('f-email').value.trim();
-    const date = document.getElementById('f-date').value.trim();
-    const type = document.getElementById('f-type').value.trim();
+    const phone = document.getElementById('f-phone').value.trim();
+    const date = document.getElementById('f-date').value;
+    const type = document.getElementById('f-type').value;
+    const hours = document.getElementById('f-hours').value.trim();
+    const location = document.getElementById('f-location').value.trim();
+    const guests = document.getElementById('f-guests').value.trim();
+    const hear = document.getElementById('f-hear').value;
     const message = document.getElementById('f-msg').value.trim();
     const msg = document.getElementById('formMsg');
-    const btn = document.getElementById('submitBtn');
 
-    if (!name || !email) {
-      msg.textContent = 'Please add your name and email so we can reach you.';
-      return;
-    }
-
-    btn.disabled = true;
+    nextBtn.disabled = true;
+    backBtn.disabled = true;
     msg.textContent = 'Sending...';
 
     try {
@@ -412,15 +566,22 @@
           name: name,
           email: email,
           _replyto: email,
+          phone: phone,
           event_date: date,
           event_type: type,
+          hours_of_service: hours,
+          catering_location: location,
+          number_of_guests: guests,
+          heard_about_us: hear,
           message: message,
           _subject: 'New event inquiry from ' + name + ' — SIP website'
         })
       });
       if (res.ok) {
-        msg.textContent = 'Thanks, ' + name + '! We\'ll be in touch soon. ☕';
-        ['f-name','f-email','f-date','f-type','f-msg'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('bookForm').classList.add('hidden');
+        const cta = document.getElementById('bookCta');
+        cta.classList.remove('hidden');
+        cta.innerHTML = '<p style="font-size:1.2rem;color:var(--crema);font-style:italic;">Thanks, ' + name + '! Your request is in — we\'ll be in touch soon. &#9749;</p>';
       } else {
         let detail = '';
         try {
@@ -430,10 +591,19 @@
           }
         } catch (_) {}
         msg.textContent = 'Something went wrong' + detail + '. Please email us or try again.';
+        nextBtn.disabled = false; backBtn.disabled = false;
       }
     } catch (e) {
       msg.textContent = 'Something went wrong. Please check your connection and try again.';
+      nextBtn.disabled = false; backBtn.disabled = false;
     }
-    btn.disabled = false;
+  }
+
+  // Allow Enter key to advance steps
+  document.getElementById('bookForm').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+      e.preventDefault();
+      nextBtn.click();
+    }
   });
 </script>
