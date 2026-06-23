@@ -365,8 +365,8 @@
         body: JSON.stringify({
           name: name,
           email: email,
-          'event date': date,
-          'event type': type,
+          event_date: date,
+          event_type: type,
           message: message,
           _subject: 'New event inquiry from ' + name + ' — SIP website'
         })
@@ -375,7 +375,14 @@
         msg.textContent = 'Thanks, ' + name + '! We\'ll be in touch soon. ☕';
         ['f-name','f-email','f-date','f-type','f-msg'].forEach(id => document.getElementById(id).value = '');
       } else {
-        msg.textContent = 'Something went wrong. Please email us or try again.';
+        let detail = '';
+        try {
+          const data = await res.json();
+          if (data && data.errors && data.errors.length) {
+            detail = ' (' + data.errors.map(e => e.message).join(', ') + ')';
+          }
+        } catch (_) {}
+        msg.textContent = 'Something went wrong' + detail + '. Please email us or try again.';
       }
     } catch (e) {
       msg.textContent = 'Something went wrong. Please check your connection and try again.';
